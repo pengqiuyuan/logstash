@@ -9,10 +9,10 @@ tag: [ Logstash, Elasticsearch, Kibana, 日志, 数据, 可视化, 安装, 配�
 - **logstash version 1.4.2**
 - **kibana 3.1.0**
 - **redis 2.6+**
-
->https://github.com/elasticsearch/elasticsearch.git &&
->https://github.com/chenryn/kibana.git 
-
+```
+https://github.com/elasticsearch/elasticsearch.git &&
+https://github.com/chenryn/kibana.git 
+```
 ## 两个主要的使用场景:
 ---
 #### 1. Standalone server:
