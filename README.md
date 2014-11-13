@@ -155,5 +155,10 @@ output {
 }
 ```
 
-
+#### 10.运行,es、redis已启动,nginx配置好kibana的访问路径,logstash1.4.2下载完成
+```
+bin/logstash agent -f ../agent.conf &
+bin/logstash agent -f ../index.conf &
+```
+![img](http://182.92.69.21/images/logstashImage/12.png)
 
