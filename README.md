@@ -42,7 +42,109 @@ http://182.92.69.21/kibana/src/index.html#/dashboard/file/logstash.json
 ![img](http://182.92.69.21/images/logstashImage/8.png)
 ![img](http://182.92.69.21/images/logstashImage/9.png)
 ![img](http://182.92.69.21/images/logstashImage/10.png)
-#### 7. 整体展示,histogram
+#### 7.遇到的问题,es内部队列满了导致search出错
+![img](http://182.92.69.21/images/logstashImage/11.png)
+解决的办法:threadpool.search.queue_size: -1,具体看自己机器的配置
+#### 8.nginx,log日志的正则匹配
+网站地址:http://grokdebug.herokuapp.com/
+如:10:18:50.699 [http-bio-8090-exec-3] DEBUG c.h.f.m.F.selectByDate - <==      Total: 10
+正则:%{TIME:time} %{SYSLOG5424SD:syslog5424sd} %{WORD:status} %{JAVACLASS:class}
+结果:
+{
+  "time": [
+    [
+      "10:18:50.699"
+    ]
+  ],
+  "syslog5424sd": [
+    [
+      "[http-bio-8090-exec-3]"
+    ]
+  ],
+  "status": [
+    [
+      "DEBUG"
+    ]
+  ],
+  "class": [
+    [
+      "c.h.f.m.F.selectByDate"
+    ]
+  ]
+}
+
+#### 9.logstash,agent
+input {   
+ file {   
+   type => "nginx"   
+   path => ["/usr/local/nginx/logs/*.log"]
+   #type => "fund"
+   #path => ["/usr/local/logstash/fund.*.log"]
+   exclude => ["*.gz"]
+   tags => ["nginx"]   
+   start_position => beginning
+ }   
+}
+output {   
+ stdout {}
+ redis {   
+   host => "127.0.0.1"   
+   data_type => "list"   
+   key => "logstash"   
+ }   
+}
+
+#### 9.logstash,index.conf
+input {   
+ redis {   
+   host => "127.0.0.1"   
+   port => "6379"    
+   data_type => "list"   
+   key => "logstash"   
+ }   
+}
+
+#filter {
+#    mutate { replace => { "type" => "nginx-log" } }
+#    grok {
+#      match => { "message" => "%{COMBINEDAPACHELOG}" }
+#    }
+#    date {
+#      match => [ "timestamp" , "yyyy/MMM/dd:HH:mm:ss" ]
+#    }
+#}
+
+
+#filter {
+#    mutate { replace => { "type" => "fund" } }
+#    grok {
+#      match => { "message" => "%{URIHOST}:%{BASE16FLOAT} %{SYSLOG5424SD} DEBUG %{JAVACLASS}" }
+#    }
+#  date {
+#    match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss ZZZ" ]
+#  }
+#}
+
+filter {
+    mutate { replace => { "type" => "nginx_log" } }
+    grok {
+      match => { "message" => "%{COMBINEDAPACHELOG}" }
+    }
+    date {
+      match => [ "timestamp" , "dd/MMM/yyyy:HH:mm:ss Z" ]
+    }
+    geoip {
+      source => "clientip"
+    }
+}
+
+output {
+  elasticsearch {
+    host => "127.0.0.1"
+  }
+  stdout { codec => rubydebug }
+}
+
 
 
 
