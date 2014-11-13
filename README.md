@@ -47,9 +47,16 @@ http://182.92.69.21/kibana/src/index.html#/dashboard/file/logstash.json
 解决的办法:threadpool.search.queue_size: -1,具体看自己机器的配置
 #### 8.nginx,log日志的正则匹配
 网站地址:http://grokdebug.herokuapp.com/
-如:10:18:50.699 [http-bio-8090-exec-3] DEBUG c.h.f.m.F.selectByDate - <==      Total: 10
-正则:%{TIME:time} %{SYSLOG5424SD:syslog5424sd} %{WORD:status} %{JAVACLASS:class}
+如:
+```
+10:18:50.699 [http-bio-8090-exec-3] DEBUG c.h.f.m.F.selectByDate - <==      Total: 10
+```
+正则:
+```
+%{TIME:time} %{SYSLOG5424SD:syslog5424sd} %{WORD:status} %{JAVACLASS:class}
+```
 结果:
+```
 {
   "time": [
     [
@@ -72,8 +79,9 @@ http://182.92.69.21/kibana/src/index.html#/dashboard/file/logstash.json
     ]
   ]
 }
-
+```
 #### 9.logstash,agent
+```
 input {   
  file {   
    type => "nginx"   
@@ -93,8 +101,9 @@ output {
    key => "logstash"   
  }   
 }
-
+```
 #### 9.logstash,index.conf
+```
 input {   
  redis {   
    host => "127.0.0.1"   
@@ -144,7 +153,7 @@ output {
   }
   stdout { codec => rubydebug }
 }
-
+```
 
 
 
