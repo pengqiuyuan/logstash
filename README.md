@@ -1,4 +1,4 @@
 logstash
 ========
 
-logstash+redis+kibana
+elasticsearch+logstash+redis+kibana
